@@ -20,8 +20,8 @@ statuses:
 
 “Supported” here refers to the board status in that micro-ROS branch. The
 chosen PWM servo library, pin availability, memory use, and board toolchain
-must also be suitable for the particular project. The included InMoov example
-uses a Teensy 4.1 pin configuration.
+must also be suitable for the particular project. The included example uses a
+Teensy 4.1 pin configuration.
 
 ## Install dependencies
 
@@ -34,12 +34,12 @@ instructions when required by the selected precompiled release. Arduino IDE
 does not necessarily automate all of that board-specific setup.
 
 Then install this library from a release ZIP or clone/copy it into the Arduino
-libraries directory. Open `examples/InMoovTeensy/InMoovTeensy.ino` in Arduino
+libraries directory. Open `examples/TeensyServoExample/TeensyServoExample.ino` in Arduino
 IDE, select the target Teensy board, and build/upload.
 
-## Configure another robot
+## Configure your project
 
-Copy the example and replace `InMoovServoConfig.h` with your own definitions.
+Copy the example and replace `ServoConfig.h` with your own definitions.
 Each `ServoDefinition` provides a name, PWM pin, logical angle limits, pulse
 width limits, direction, maximum movement speed, and startup angle. Supply one
 ROS joint name per servo in the same order. The library supports up to

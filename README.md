@@ -10,7 +10,7 @@
 
 </div>
 
-Use the same controller code with your own servo pins, calibration, joint names, and ROS topics. This repository includes the InMoov configuration as a working starting point; the library itself does not require the InMoov robot model.
+Use the same controller code with your own servo pins, calibration, joint names, and ROS topics. The included example provides a starting point for a custom Teensy-based servo project.
 
 > **Compatibility:** targets the ROS 2 Humble branch of [`micro_ros_arduino`](https://github.com/micro-ROS/micro_ros_arduino/tree/humble). Teensy support status varies by board; see [Supported boards](#supported-boards).
 
@@ -28,7 +28,7 @@ flowchart LR
 - **Embedded-friendly:** fixed-capacity storage for up to 32 servos; no heap allocation in the controller.
 - **Motion handling:** clamps target angles and steps toward targets at the configured speed.
 - **Connection behavior:** retries micro-ROS entity creation after a disconnect and can hold the last estimated position after a command timeout.
-- **Example included:** 20-servo InMoov Teensy setup.
+- **Example included:** configurable Teensy servo setup.
 
 ## Supported boards
 
@@ -42,7 +42,7 @@ This library targets Teensy 3.x and 4.x boards supported by the selected Humble 
 | 4.0 | Not tested |
 | 4.1 | Supported |
 
-Those statuses describe micro-ROS's board support, not a guarantee that every servo library, pin assignment, or project configuration works unchanged. The included InMoov example is configured for Teensy 4.1. Select PWM-capable pins and confirm the chosen `PWMServo` version and board toolchain for your target.
+Those statuses describe micro-ROS's board support, not a guarantee that every servo library, pin assignment, or project configuration works unchanged. The included example is configured for Teensy 4.1. Select PWM-capable pins and confirm the chosen `PWMServo` version and board toolchain for your target.
 
 ## Install
 
@@ -56,7 +56,7 @@ In Arduino IDE, choose **Sketch → Include Library → Add .ZIP Library…** an
 
 ### 3. Open the example
 
-Open [`examples/InMoovTeensy/InMoovTeensy.ino`](examples/InMoovTeensy/InMoovTeensy.ino), select your Teensy board and port, then build and upload. Start a micro-ROS Agent on the host using the transport configured in the sketch. For USB serial, for example:
+Open [`examples/TeensyServoExample/TeensyServoExample.ino`](examples/TeensyServoExample/TeensyServoExample.ino), select your Teensy board and port, then build and upload. Start a micro-ROS Agent on the host using the transport configured in the sketch. For USB serial, for example:
 
 ```bash
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0 -v6
@@ -64,9 +64,9 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0 -v6
 
 Replace `/dev/ttyACM0` with the Teensy's serial device. The ROS 2 installation on the host must include the matching Humble micro-ROS Agent.
 
-## Configure your robot
+## Configure your project
 
-Copy the example and replace its [`InMoovServoConfig.h`](examples/InMoovTeensy/InMoovServoConfig.h) with your servo definitions. Keep the servo definitions and ROS joint names in the same order.
+Copy the example and replace its [`ServoConfig.h`](examples/TeensyServoExample/ServoConfig.h) with your servo definitions. Keep the servo definitions and ROS joint names in the same order.
 
 ```cpp
 static const ServoDefinition MY_SERVOS[] = {
@@ -95,7 +95,7 @@ const MicroROSControllerConfig rosConfig = {
 MicroROSController microRosController(servoController, rosConfig);
 ```
 
-In `setup()`, call `servoController.begin()` and `microRosController.begin()`. In `loop()`, call `microRosController.spinOnce()` and `servoController.update()` regularly. See the complete [InMoov example](examples/InMoovTeensy/InMoovTeensy.ino).
+In `setup()`, call `servoController.begin()` and `microRosController.begin()`. In `loop()`, call `microRosController.spinOnce()` and `servoController.update()` regularly. See the complete [Teensy servo example](examples/TeensyServoExample/TeensyServoExample.ino).
 
 By default, `begin()` configures the micro-ROS Arduino serial transport. To use another transport available in your selected micro-ROS build, configure that transport first and call `microRosController.begin(false)`.
 
@@ -103,10 +103,10 @@ By default, `begin()` configures the micro-ROS Arduino serial transport. To use 
 
 | Direction | Topic | Message | Meaning |
 | --- | --- | --- | --- |
-| ROS 2 → Teensy | `/inmoov/joint_commands` | `std_msgs/msg/Float32MultiArray` | Target angles in radians, one per servo in configured order |
-| Teensy → ROS 2 | `/inmoov/joint_states` | `sensor_msgs/msg/JointState` | Joint names and estimated angles in radians, in configured order |
+| ROS 2 → Teensy | `/teensy/joint_commands` | `std_msgs/msg/Float32MultiArray` | Target angles in radians, one per servo in configured order |
+| Teensy → ROS 2 | `/teensy/joint_states` | `sensor_msgs/msg/JointState` | Joint names and estimated angles in radians, in configured order |
 
-The InMoov names above are example defaults; configure your own names in `MicroROSControllerConfig`. A command array must contain exactly one finite value per servo. Targets are clamped to each servo's configured angle limits.
+The topic names above are example defaults; configure your own names in `MicroROSControllerConfig`. A command array must contain exactly one finite value per servo. Targets are clamped to each servo's configured angle limits.
 
 **State positions are estimates based on commanded movement, not encoder measurements.** This library drives hobby-servo PWM outputs and does not measure physical joint position.
 
@@ -117,6 +117,6 @@ The example values are starting points, not verified calibration for your robot.
 ## More information
 
 - [Installation and configuration guide](docs/GettingStarted.md)
-- [InMoov trajectory control guide](docs/ros2_control_trajectory.md)
+- [Trajectory control guide](docs/ros2_control_trajectory.md)
 - [`micro_ros_arduino` Humble branch](https://github.com/micro-ROS/micro_ros_arduino/tree/humble)
 - [micro-ROS Agent](https://github.com/micro-ROS/micro-ROS-Agent)
